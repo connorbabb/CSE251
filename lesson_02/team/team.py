@@ -61,7 +61,7 @@ if __name__ == '__main__':
     #        team_get_deck_id.py program once. You can have
     #        multiple decks if you need them
 
-    deck_id = 'ENTER ID HERE'
+    deck_id = 'fpvh7t5dpjlr'
 
     # Testing Code >>>>>
     deck = Deck(deck_id)
