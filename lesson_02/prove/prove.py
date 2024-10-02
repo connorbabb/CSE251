@@ -2,7 +2,7 @@
 Course: CSE 251 
 Lesson: L02 Prove
 File:   prove.py
-Author: <Add name here>
+Author: Connor Babb
 
 Purpose: Retrieve Star Wars details from a server
 
@@ -50,35 +50,75 @@ import requests
 import json
 import threading
 
-# Include cse 251 common Python files
-from cse251 import *
-
-# Const Values
+# URL for the Star Wars API
 TOP_API_URL = 'http://127.0.0.1:8790'
 
 # Global Variables
 call_count = 0
 
+class Request_Thread(threading.Thread):
+    
+    def __init__(self, url, result_list, name):
+        threading.Thread.__init__(self)
+        self.url = url
+        self.result_list = result_list
+        self.name = name
 
-# TODO Add your threaded class definition here
-
-
-# TODO Add any functions you need here
-
+    def run(self):
+        global call_count
+        response = requests.get(self.url)
+        self.status_code = response.status_code
+        if response.status_code == 200:
+            data = response.json()
+            self.result_list.append(data['name'])
+            call_count += 1
+        else:
+            print('RESPONSE = ', response.status_code)
 
 def main():
-    log = Log(show_terminal=True)
-    log.start_timer('Starting to retrieve data from the server')
+    print(f'{datetime.now().strftime('%H:%M:%S')}| Starting to retrieve data from the server')
+    print(f'{datetime.now().strftime('%H:%M:%S')}| ----------------------------------------')
+    start_time = datetime.now()
+    response = requests.get(TOP_API_URL)
 
-    # TODO Retrieve Top API urls
+    api_urls = response.json()
 
-    # TODO Retrieve Details on film 6
+    film_6_url = api_urls['films'] + '6'
+    response = requests.get(film_6_url)
+    film_6_data = response.json()
 
-    # TODO Display results
+    print(f"{datetime.now().strftime('%H:%M:%S')}| Title   : {film_6_data['title']}")
+    print(f"{datetime.now().strftime('%H:%M:%S')}| Director: {film_6_data['director']}")
+    print(f"{datetime.now().strftime('%H:%M:%S')}| Producer: {film_6_data['producer']}")
+    print(f"{datetime.now().strftime('%H:%M:%S')}| Released: {film_6_data['release_date']}")
+    print(f"{datetime.now().strftime('%H:%M:%S')}|")
 
-    log.stop_timer('Total Time To complete')
-    log.write(f'There were {call_count} calls to the server')
-    
+    categories = ['characters', 'starships', 'vehicles', 'planets', 'species']
+    result_dict = {category: [] for category in categories}
+    threads = []
+
+    for category in categories:
+        urls = film_6_data[category]
+        for url in urls:
+            thread = Request_Thread(url, result_dict[category], category)
+            threads.append(thread)
+            thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    for category in categories:
+        result_dict[category].sort()
+        print(f"{datetime.now().strftime('%H:%M:%S')}| {category.capitalize()}: {len(result_dict[category])}")
+        items_line = ', '.join(result_dict[category])
+        print(f"{datetime.now().strftime('%H:%M:%S')}| {items_line}")
+        print(f'{datetime.now().strftime('%H:%M:%S')}|')
+
+    end_time = datetime.now()
+    total_time = end_time - start_time
+    total_time = total_time.total_seconds()
+    print(f'{datetime.now().strftime('%H:%M:%S')}| Total Time To Complete = {total_time:.8f} ')
+    print(f'{datetime.now().strftime('%H:%M:%S')}| There were {call_count} calls to swapi server')
 
 if __name__ == "__main__":
     main()

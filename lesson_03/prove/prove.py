@@ -77,7 +77,7 @@ def main():
 
     # sample code: remove before submitting  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # process one frame #10
-    image_number = 10
+    image_number = 10 # Put it in a loop from 1 to 300, using one cpu, and time it. Then do it with 2 cpus, then 3, etc.
 
     image_file = f'elephant/image{image_number:03d}.png'
     green_file = f'green/image{image_number:03d}.png'
