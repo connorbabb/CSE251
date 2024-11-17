@@ -2,7 +2,7 @@
 Course: CSE 251 
 Lesson: L03 Prove
 File:   prove.py
-Author: <Add name here>
+Author: Connor Babb
 
 Purpose: Video Frame Processing
 
@@ -30,14 +30,15 @@ CPU_COUNT = mp.cpu_count() + 4
 
 # TODO Your final video needs to have 300 processed frames.
 # However, while you are testing your code, set this much lower!
-FRAME_COUNT = 20
+FRAME_COUNT = 300
 
 # RGB values for reference
 RED = 0
 GREEN = 1
 BLUE = 2
 
-def create_new_frame(image_file, green_file, process_file):
+def create_new_frame(args):
+    image_file, green_file, process_file = args
     """"
     Creates a new image file from image_file and green_file.
     
@@ -75,18 +76,29 @@ def main():
 
     # TODO Process all frames trying 1 cpu, then 2, then 3, ... to CPU_COUNT
 
-    # sample code: remove before submitting  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    # process one frame #10
-    image_number = 10 # Put it in a loop from 1 to 300, using one cpu, and time it. Then do it with 2 cpus, then 3, etc.
+    tasks = []
 
-    image_file = f'elephant/image{image_number:03d}.png'
-    green_file = f'green/image{image_number:03d}.png'
-    process_file = f'processed/image{image_number:03d}.png'
+    for i in range(1, 301):
+        image_number = i
+        image_file = f'elephant/image{image_number:03d}.png'
+        green_file = f'green/image{image_number:03d}.png'
+        process_file = f'processed/image{image_number:03d}.png'
+        tasks.append((image_file, green_file, process_file))
 
-    start_time = timeit.default_timer()
-    create_new_frame(image_file, green_file, process_file)
-    print(f'\nTime To Process all images = {timeit.default_timer() - start_time}')
-    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    i = 1
+    while i <= CPU_COUNT:
+        with mp.Pool(i) as p:
+            start_time = timeit.default_timer()
+            p.map(create_new_frame, tasks)
+            processing_time = timeit.default_timer() - start_time
+
+            current_time = datetime.now()
+            formatted_time = current_time.strftime("%H:%M:%S")
+            print(f'{formatted_time}| Time for 300 frames using {i} processes: {timeit.default_timer() - start_time}')
+
+            xaxis_cpus.append(i)
+            yaxis_times.append(processing_time)
+        i += 1
 
     # Log the total time this took
     log.write(f'Total Time for ALL processing: {timeit.default_timer() - all_process_time}')

@@ -1,0 +1,40 @@
+23:41:03| 0 cars have been created. = 2.35990300
+23:41:03| Factories      : 1
+23:41:03| Dealerships    : 1
+23:41:03| Run Time       : 2.3599
+23:41:03| Max queue size : 204
+23:41:03| Factory Stats  : Made = 0 @ [203]
+23:41:03| Dealer Stats   : Sold = 203 @ [0]
+23:41:03| 
+23:41:05| 0 cars have been created. = 2.58601850
+23:41:05| Factories      : 1
+23:41:05| Dealerships    : 2
+23:41:05| Run Time       : 2.5860
+23:41:05| Max queue size : 238
+23:41:05| Factory Stats  : Made = 0 @ [236]
+23:41:05| Dealer Stats   : Sold = 236 @ [0, 0]
+23:41:05| 
+23:41:09| 0 cars have been created. = 3.39613030
+23:41:09| Factories      : 2
+23:41:09| Dealerships    : 1
+23:41:09| Run Time       : 3.3961
+23:41:09| Max queue size : 565
+23:41:09| Factory Stats  : Made = 0 @ [300, 264]
+23:41:09| Dealer Stats   : Sold = 564 @ [0]
+23:41:09| 
+23:41:12| 0 cars have been created. = 2.84679800
+23:41:12| Factories      : 2
+23:41:12| Dealerships    : 2
+23:41:12| Run Time       : 2.8468
+23:41:12| Max queue size : 467
+23:41:12| Factory Stats  : Made = 0 @ [236, 229]
+23:41:12| Dealer Stats   : Sold = 465 @ [0, 0]
+23:41:12| 
+23:41:15| 0 cars have been created. = 3.16692340
+23:41:15| Factories      : 2
+23:41:15| Dealerships    : 5
+23:41:15| Run Time       : 3.1669
+23:41:15| Max queue size : 553
+23:41:15| Factory Stats  : Made = 0 @ [285, 263]
+23:41:15| Dealer Stats   : Sold = 548 @ [0, 0, 0, 0, 0]
+23:41:15| 

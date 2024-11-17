@@ -1,0 +1,56 @@
+19:19:32| 0 cars have been created. = 2.46103950
+19:19:32| Factories      : 1
+19:19:32| Dealerships    : 1
+19:19:32| Run Time       : 2.4610
+19:19:32| Max queue size : 228
+19:19:32| Factory Stats  : Made = 0 @ [227]
+19:19:32| Dealer Stats   : Sold = 227 @ [0]
+19:19:32| 
+19:19:35| 0 cars have been created. = 2.83428680
+19:19:35| Factories      : 1
+19:19:35| Dealerships    : 2
+19:19:35| Run Time       : 2.8343
+19:19:35| Max queue size : 263
+19:19:35| Factory Stats  : Made = 0 @ [261]
+19:19:35| Dealer Stats   : Sold = 261 @ [0, 0]
+19:19:35| 
+19:19:38| 0 cars have been created. = 2.70527700
+19:19:38| Factories      : 2
+19:19:38| Dealerships    : 1
+19:19:38| Run Time       : 2.7053
+19:19:38| Max queue size : 461
+19:19:38| Factory Stats  : Made = 0 @ [203, 257]
+19:19:38| Dealer Stats   : Sold = 460 @ [0]
+19:19:38| 
+19:19:41| 0 cars have been created. = 3.16747880
+19:19:41| Factories      : 2
+19:19:41| Dealerships    : 2
+19:19:41| Run Time       : 3.1675
+19:19:41| Max queue size : 521
+19:19:41| Factory Stats  : Made = 0 @ [289, 230]
+19:19:41| Dealer Stats   : Sold = 519 @ [0, 0]
+19:19:41| 
+19:19:44| 0 cars have been created. = 3.11104910
+19:19:44| Factories      : 2
+19:19:44| Dealerships    : 5
+19:19:44| Run Time       : 3.1110
+19:19:44| Max queue size : 593
+19:19:44| Factory Stats  : Made = 0 @ [294, 294]
+19:19:44| Dealer Stats   : Sold = 588 @ [0, 0, 0, 0, 0]
+19:19:44| 
+19:19:47| 0 cars have been created. = 3.10751010
+19:19:47| Factories      : 5
+19:19:47| Dealerships    : 2
+19:19:47| Run Time       : 3.1075
+19:19:47| Max queue size : 1220
+19:19:47| Factory Stats  : Made = 0 @ [291, 241, 267, 209, 210]
+19:19:47| Dealer Stats   : Sold = 1218 @ [0, 0]
+19:19:47| 
+19:19:50| 0 cars have been created. = 3.00013640
+19:19:50| Factories      : 10
+19:19:50| Dealerships    : 10
+19:19:50| Run Time       : 3.0001
+19:19:50| Max queue size : 2379
+19:19:50| Factory Stats  : Made = 0 @ [226, 237, 280, 260, 259, 207, 238, 207, 231, 224]
+19:19:50| Dealer Stats   : Sold = 2369 @ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+19:19:50| 

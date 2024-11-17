@@ -1,0 +1,11 @@
+13:20:45| Marble count     = 1000
+13:20:45| Marble delay     = 0.01
+13:20:45| Marbles in a bag = 7
+13:20:45| Bagger delay     = 0.05
+13:20:45| Assembler delay  = 0.05
+13:20:45| Wrapper delay    = 0.05
+13:20:45| Create the processes
+13:20:45| Starting the processes
+13:20:45| Waiting for processes to finish
+13:20:47| ERROR: The file boxes.txt doesn't exist.  No boxes were created.
+13:20:47| Total time = 1.84827090
