@@ -21,11 +21,15 @@ position:
 
 What would be your strategy?
 
-<Answer here>
+I am going to copy my code down from part 1 first off, get rid the pathing stuff. Then I
+am going to start threads for each move possible.
 
 Why would it work?
 
-<Answer here>
+If there are 3 moves, create 2 other 
+threads with different colors and have those do there thing. When a thread reaches a dead
+end instead of backtracking, kill the thread. This will essentially do the same thing as part 1
+except with concurrent paths.
 
 """
 
@@ -66,6 +70,7 @@ FAST_SPEED = 0
 current_color_index = 0
 thread_count = 0
 stop = False
+lock = threading.Lock()
 speed = SLOW_SPEED
 
 def get_color():
@@ -83,11 +88,50 @@ def get_color():
 
 def solve_find_end(maze):
     """ Finds the end position using threads. Nothing is returned. """
-    # When one of the threads finds the end position, stop all of them.
     global stop
     stop = False
+    row, col = maze.get_start_pos()
 
+    def solve(row, col, color):
+        global stop
 
+        if stop:
+            return
+
+        maze.move(row, col, color)
+
+        if maze.at_end(row, col):
+            with lock:
+                stop = True
+            return
+
+        possible_moves = maze.get_possible_moves(row, col)
+
+        if len(possible_moves) > 1:
+            threads = []
+            first_move = possible_moves[0]
+            remaining_moves = possible_moves[1:]
+
+            # Create new threads for other moves
+            for move in remaining_moves:
+                if maze.can_move_here(move[0], move[1]) and not stop:
+                    thread_color = get_color()
+                    thread = threading.Thread(target=solve, args=(move[0], move[1], thread_color))
+                    threads.append(thread)
+                    thread.start()
+
+            next_row, next_col = first_move
+            if maze.can_move_here(next_row, next_col) and not stop:
+                solve(next_row, next_col, color)
+
+            for thread in threads:
+                thread.join()
+
+        elif len(possible_moves) == 1:
+            if maze.can_move_here(possible_moves[0][0], possible_moves[0][1]) and not stop:
+                solve(possible_moves[0][0], possible_moves[0][1], color)
+
+    solve(row, col, get_color())
 
 
 def find_end(log, filename, delay):

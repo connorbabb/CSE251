@@ -1,82 +1,85 @@
-/*
- * CSE 251, Week 10
- * Team 1 - finding primes in an array
- *
- * NOTE: You are using the thread class, NOT PThreads!!!!!!!
- *
- * TODO
- * 1) Get this program compiling an running in a compiler or replit.com
- * 2) Create a thread to process the array
- * 3) Create multiple threads to process the array
- * 4) if the output of the primes from the threads are mixed up, add a lock for
- *    the cout statements.
- */
-
 #include <iostream>
 #include <thread>
 #include <mutex>
 
 using namespace std;
 
-#define NUMBERS 500
+#define NUMBERS 1000000
+#define THREAD_COUNT 4
 
 mutex counterLock; // lock for primes
 int primes = 0;    // Global count
 
 // ----------------------------------------------------------------------------
+
+// Function to check if a number is prime
 int isPrime(int number)
 {
     if (number <= 3 && number > 1)
     {
-        return 1; // as 2 and 3 are prime
+        return 1; // 2 and 3 are prime
     }
     else if (number % 2 == 0 || number % 3 == 0)
     {
-        return 0; // check if number is divisible by 2 or 3
+        return 0; // Not prime
     }
     else
     {
         for (unsigned int i = 5; i * i <= number; i += 6)
         {
             if (number % i == 0 || number % (i + 2) == 0)
-                return 0;
+                return 0; // Not prime
         }
-        return 1;
+        return 1; // Prime
+    }
+}
+
+// Thread function to find primes in a given range
+void findPrimes(int* array, int start, int end) {
+    for (int i = start; i < end; ++i) {
+        if (isPrime(array[i])) {
+            lock_guard<mutex> lock(counterLock); // Lock when modifying shared data
+            ++primes;
+            cout << array[i] << endl; // Safe to output
+        }
     }
 }
 
 int main()
 {
-
     srand(42);
 
-    // Create the array of numbers and assign random values to them
+    // Create the array of random numbers and assign random values to them
     int *arrayValues = new int[NUMBERS];
     for (int i = 0; i < NUMBERS; i++)
     {
         arrayValues[i] = rand() % 1000000000;
-        //        cout << arrayValues[i] << ", ";
-    }
-    cout << endl;
-
-    cout << endl
-         << "Starting findPrimes" << endl;
-    // Loop through the array looking for prime numbers
-    int start = 0;
-    int end = NUMBERS - 1;
-    for (int i = start; i < end; i++)
-    {
-        if (isPrime(arrayValues[i]) == 1)
-        {
-            lock_guard<mutex> lock(counterLock);
-            ++primes;
-            cout << arrayValues[i] << endl;
-        }
     }
 
-    // Should be the same each run of the program
+    cout << endl << "Starting findPrimes" << endl;
+
+    // Create an array of threads
+    thread threads[THREAD_COUNT];
+
+    // Divide the work among threads
+    int chunkSize = NUMBERS / THREAD_COUNT;
+
+    for (int i = 0; i < THREAD_COUNT; ++i) {
+        int start = i * chunkSize;
+        // Ensure the last thread processes all remaining elements
+        int end = (i == THREAD_COUNT - 1) ? NUMBERS : start + chunkSize;
+        
+        threads[i] = thread(findPrimes, arrayValues, start, end);
+    }
+
+    // Wait for all threads to finish
+    for (int i = 0; i < THREAD_COUNT; ++i) {
+        threads[i].join();
+    }
+
+    // Output the total number of primes found
     cout << "\nPrimes found: " << primes << endl;
 
-    delete[] arrayValues;
+    delete[] arrayValues; // Clean up memory
     return 0;
 }

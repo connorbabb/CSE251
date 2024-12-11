@@ -48,6 +48,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -70,41 +71,76 @@ type Person struct {
 	Vehicles   []string
 }
 
-func getPerson(url string) {
-	// make a sample HTTP GET request
-	res, err := http.Get(url)
+func getPerson(url string, wg *sync.WaitGroup) {
+	// Ensure Done is called even if an error occurs
+	defer wg.Done()
 
-	// check for response error
+	// Make an HTTP GET request
+	res, err := http.Get(url)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error fetching URL %s: %v\n", url, err)
+		return
+	}
+	defer res.Body.Close()
+
+	// Read all response body
+	data, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Printf("Error reading response body for URL %s: %v\n", url, err)
+		return
 	}
 
-	// read all response body
-	data, _ := ioutil.ReadAll(res.Body)
-
-	// close response body
-	res.Body.Close()
-
-	// fmt.Println(string(data))
-
-	person := Person{}
+	// Unmarshal the JSON data into the Person struct
+	var person Person
 	jsonErr := json.Unmarshal(data, &person)
 	if jsonErr != nil {
-		log.Fatal(jsonErr)
-		fmt.Println("ERROR Pasing the JSON")
+		log.Printf("Error parsing JSON for URL %s: %v\n", url, jsonErr)
+		return
 	}
 
+	// Print the person details
 	fmt.Println("-----------------------------------------------")
-	// fmt.Println(person)
 	fmt.Println("Name      : ", person.Name)
 	fmt.Println("Birth     : ", person.Birth_year)
 	fmt.Println("Eye color : ", person.Eye_color)
 }
 
+func getSpecies(url string, wg *sync.WaitGroup) {
+	// Ensure Done is called even if an error occurs
+	defer wg.Done()
+
+	// Make an HTTP GET request
+	res, err := http.Get(url)
+	if err != nil {
+		log.Printf("Error fetching URL %s: %v\n", url, err)
+		return
+	}
+	defer res.Body.Close()
+
+	// Read all response body
+	data, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Printf("Error reading response body for URL %s: %v\n", url, err)
+		return
+	}
+
+	// Unmarshal the JSON data into the Person struct
+	var person Person
+	jsonErr := json.Unmarshal(data, &person)
+	if jsonErr != nil {
+		log.Printf("Error parsing JSON for URL %s: %v\n", url, jsonErr)
+		return
+	}
+
+	// Print the person details
+	fmt.Println("-----------------------------------------------")
+	fmt.Println("Species      : ", person.Species)
+}
+
 func main() {
+	fmt.Println("Starting...")
 
-	// TODO: Review wait groups for this problem
-
+	// List of URLs to fetch
 	urls := []string{
 		"http://swapi.dev/api/people/1/",
 		"http://swapi.dev/api/people/2/",
@@ -125,10 +161,43 @@ func main() {
 		"http://swapi.dev/api/people/19/",
 		"http://swapi.dev/api/people/81/",
 	}
+	urls2 := []string{
+		"http://swapi.dev/api/species/1/",
+		"http://swapi.dev/api/species/2/",
+		"http://swapi.dev/api/species/3/",
+		"http://swapi.dev/api/species/6/",
+		"http://swapi.dev/api/species/15/",
+		"http://swapi.dev/api/species/19/",
+		"http://swapi.dev/api/species/20/",
+		"http://swapi.dev/api/species/23/",
+		"http://swapi.dev/api/species/24/",
+		"http://swapi.dev/api/species/25/",
+		"http://swapi.dev/api/species/26/",
+		"http://swapi.dev/api/species/27/",
+		"http://swapi.dev/api/species/28/",
+		"http://swapi.dev/api/species/29/",
+		"http://swapi.dev/api/species/30/",
+		"http://swapi.dev/api/species/33/",
+		"http://swapi.dev/api/species/34/",
+		"http://swapi.dev/api/species/35/",
+		"http://swapi.dev/api/species/36/",
+		"http://swapi.dev/api/species/37/",
+	}
+
+	// Create a WaitGroup to wait for all goroutines to complete
+	var wg sync.WaitGroup
 
 	for _, url := range urls {
-		getPerson(url)
+		wg.Add(1)
+		go getPerson(url, &wg) // Launch each fetch in a goroutine
 	}
+	for _, url := range urls2 {
+		wg.Add(1)
+		go getSpecies(url, &wg) // Launch each fetch in a goroutine
+	}
+
+	// Wait for all goroutines to complete
+	wg.Wait()
 
 	fmt.Println("All done!")
 }
