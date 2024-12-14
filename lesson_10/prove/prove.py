@@ -65,37 +65,89 @@ BUFFER_SIZE = 10
 READERS = 2
 WRITERS = 2
 
-def main():
+def reader(shareable_list, buffer_lock, items_to_read_sem, space_available_sem):
+    """Reader process function"""
+    while True:
+        items_to_read_sem.acquire()
 
-    # This is the number of values that the writer will send to the reader
-    items_to_send = random.randint(1000, 10000)
+        with buffer_lock:
+            tail = shareable_list[BUFFER_SIZE + 1]
+
+            value = shareable_list[tail]
+            if value == -1:
+                break
+
+            print(value, end=', ', flush=True)
+
+            shareable_list[tail] = 0
+            tail = (tail + 1) % BUFFER_SIZE
+            shareable_list[BUFFER_SIZE + 1] = tail
+
+            shareable_list[BUFFER_SIZE + 3] += 1
+
+        space_available_sem.release()
+
+
+def writer(shareable_list, buffer_lock, items_to_read_sem, space_available_sem, items_to_send):
+    """Writer process function"""
+    for _ in range(items_to_send):
+        space_available_sem.acquire()
+
+        with buffer_lock:
+            head = shareable_list[BUFFER_SIZE]
+
+            value = shareable_list[BUFFER_SIZE + 2]
+            shareable_list[head] = value
+            head = (head + 1) % BUFFER_SIZE
+
+            shareable_list[BUFFER_SIZE] = head
+            shareable_list[BUFFER_SIZE + 2] += 1
+
+        items_to_read_sem.release()
+
+    for _ in range(READERS):
+      with buffer_lock:
+          head = shareable_list[BUFFER_SIZE]
+          shareable_list[head] = -1
+          head = (head + 1) % BUFFER_SIZE
+          shareable_list[BUFFER_SIZE] = head
+
+      items_to_read_sem.release()
+
+def main():
+    items = random.randint(1000, 10000)
+    items_to_send = items // WRITERS
 
     smm = SharedMemoryManager()
     smm.start()
 
-    # TODO - Create a ShareableList to be used between the processes
-    #      - The buffer should be size 10 PLUS at least three other
-    #        values (ie., [0] * (BUFFER_SIZE + 3)).  The extra values
-    #        are used for the head and tail for the circular buffer.
-    #        The another value is the current number that the writers
-    #        need to send over the buffer.  This last value is shared
-    #        between the writers.
-    #        You can add another value to the sharedable list to keep
-    #        track of the number of values received by the readers.
-    #        (ie., [0] * (BUFFER_SIZE + 4))
+    with SharedMemoryManager() as smm:
+        shared_list = smm.ShareableList([0] * BUFFER_SIZE + [0, 0, 1, 0])  # Buffer, head, tail, and items_revieved
 
-    # TODO - Create any lock(s) or semaphore(s) that you feel you need
+        buffer_lock = mp.Lock()
+        items_to_read_sem = mp.Semaphore(0)
+        space_available_sem = mp.Semaphore(BUFFER_SIZE)
 
-    # TODO - create reader and writer processes
+        writers = [mp.Process(target=writer, args=(shared_list, buffer_lock, items_to_read_sem, space_available_sem, items_to_send)) for _ in range(WRITERS)]
+        readers = [mp.Process(target=reader, args=(shared_list, buffer_lock, items_to_read_sem, space_available_sem)) for _ in range(READERS)]
 
-    # TODO - Start the processes and wait for them to finish
+        for w in writers:
+            w.start()
+        for r in readers:
+            r.start()
 
-    print(f'{items_to_send} values sent')
+        for w in writers:
+            w.join()
+
+        for r in readers:
+            r.join()
 
     # TODO - Display the number of numbers/items received by the reader.
     #        Can not use "items_to_send", must be a value collected
     #        by the reader processes.
-    # print(f'{<your variable>} values received')
+    print()
+    print(f'{items} values sent')
+    print(f'{shared_list[BUFFER_SIZE + 3]} values received')
 
     smm.shutdown()
 
