@@ -34,6 +34,7 @@ class Request_thread(threading.Thread):
         # Check the status code to see if the request succeeded.
         if response.status_code == 200:
             self.__response = response.json()
+            print(self.__response)
         else:
             self.__response = None
             print('RESPONSE = ', response.status_code)
